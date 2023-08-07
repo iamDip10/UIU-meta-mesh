@@ -1,0 +1,92 @@
+{% load static %}
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% tailwind_css %}
+</head>
+<body class="overflow-hidden w-screen h-screen">
+    <div id="pop" class="absolute w-full h-full flex items-center justify-center" style="display: none;">
+        <div class="bg-gray-100 flex flex-col rounded-2xl" style="margin-left: 30%; margin-top: 10%; height: 55%; width: 40%;">
+            <form action="{% url 'phandle' user=enp club=clb %}" class="flex flex-col items-center">
+                <textarea class="mt-6 px-10" name="texts" id="" cols="70" rows="18" style="resize: none; border:none"></textarea>
+                <div class="w-full flex px-20 text-2xl mt-4 justify-end">
+
+                    <input class="w-1/3 bg-orange-400" style="height: 7vh;" type="submit" name="sub" id="" value="Post">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="w-full h-full flex ">
+        <div class="w-3/4 h-full flex flex-col">
+            <img src="{% static 'img/uiu.jpg' %}" alt="" class="object-cover bg-center  w-full h-1/4 rounded-2xl">
+            <h3 class="w-full text-3xl font-bold mt-8 ml-8">All Posts</h3>
+            <div class="w-full h-3/4 px-8 mt-5 flex flex-col items-center">
+                <div class="flex w-full justify-center items-center rounded-xl bg-gray-300" style="height: 8vh;">
+                    <button class="w-2/3 ml-3 pl-8 text-gray-300 bg-white flex items-center rounded-2xl" style="height: 5vh;" onclick="popup()">Share your thoughts</button>
+                </div>
+                <div class="w-full h-fit flex flex-col rounded-2xl bg-orange-100 px-8 mt-6 mb-5">
+                    <div class="w-full h-20 flex items-center">
+                        <img src="" alt="" class="w-12 h-12 rounded-full bg-black">
+                        <div class="w-2/3 h-fit flex flex-col">
+                            <h3 class="ml-2 text-md font-bold">Dip Saha</h3>
+                            <h3 class="ml-2">011201171</h3>
+                        </div>
+                    </div>
+                    <div class="w-full h-fit mt-2 mb-6">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa provident ipsum laudantium rem repellendus alias? Veniam repellat rem atque consequuntur!</p>
+                    </div>
+                    
+                    <div class="w-full h-10 flex mb-5 justify-center items-center">
+                        <div class="w-1/2 h-full flex">
+                            <button id="{{posts.iid}}" data-user="{{user.stu_id}}" data-post="{{posts.iid}}" data-csrf='{% csrf_token %}' class="vote w-full h-full flex items-center justify-center rounded-2xl hover:text-orange-500 hover:font-bold" data-enp="{{enp}}">
+                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.9" d="M4.008 8.714c1-.097 1.96-.45 2.792-1.028a25.112 25.112 0 0 0 4.454-5.72 1.8 1.8 0 0 1 .654-.706 1.742 1.742 0 0 1 1.65-.098 1.82 1.82 0 0 1 .97 1.128c.075.248.097.51.065.767l-1.562 4.629M4.008 8.714H1v9.257c0 .273.106.535.294.728a.99.99 0 0 0 .709.301h1.002a.99.99 0 0 0 .71-.301c.187-.193.293-.455.293-.728V8.714Zm8.02-1.028h4.968c.322 0 .64.08.925.232.286.153.531.374.716.645a2.108 2.108 0 0 1 .242 1.883l-2.36 7.2c-.288.813-.48 1.354-1.884 1.354-2.59 0-5.39-1.06-7.504-1.66"/>
+                                </svg>
+                                <h3 class="ml-2">Upvote</h3>
+                            </button>
+                        </div>
+                        <div class="w-1/2 h-full">
+                            <button class="w-full h-full flex justify-center items-center hover:text-orange-500">
+                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.9" d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
+                                </svg>
+                                <h3 class="ml-2">Comment</h3>
+                            </button>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-1/4 h-full flex flex-col">
+            <div class="h-1/2 w-full flex flex-col">
+                <h3 class="text-xl font-bold mt-8 ml-8">All members</h3>
+                <div class="mt-3 w-full h-full flex flex-col px-8">
+                    <div class="mt-3 w-full flex items-center" style="height: 7vh;">
+                        <img src="" alt="" class="rounded-full" style="width: 5vh; height: 5vh;">
+                        <h3 class="ml-5">Taseen Islam</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="h-1/2 w-full flex flex-col">
+                <div class="w-full px-8 flex items-center" style="height: 7vh;">
+                    <h3 class="h-fit text-xl font-bold">Upcoming Events</h3>
+                    <button class="flex w-1/3 bg-gray-300 h-2/3 justify-center items-center " style="margin-left: 13vh;">
+                        Create new event
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function popup() {
+            document.getElementById('pop').style.display = "block";
+        }
+    </script>
+</body>
+</html>

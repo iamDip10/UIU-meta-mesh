@@ -26,4 +26,10 @@ urlpatterns = [
     path("dashboard/<str:user>", views.dashboard, name='dashb'),
     path("postit/<str:user>", views.postText, name='postit'),
     path("likeit/", views.likeit, name='likeit'),
+    path('logout/<str:user>', views.logout, name="logout"),
+    path('club/<str:user>', views.club, name="club"),
+    path('addclub/<str:user>', views.createClub, name='addclub'),
+    path('clubapprove/<str:user>/<str:club>', views.clubApprove, name='approval'),
+    path('clubdash/<str:user>/<str:club>', views.clubDash, name='cdash'),
+    path('posthandle/<str:user>/<str:club>', views.posthandling, name='phandle'),
 ]
