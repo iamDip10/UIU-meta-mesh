@@ -8,3 +8,6 @@ admin.site.register(notification)
 admin.site.register(clubs)
 admin.site.register(clubApproval)
 admin.site.register(clubpost)
+admin.site.register(clublikes)
+admin.site.register(eevent)
+

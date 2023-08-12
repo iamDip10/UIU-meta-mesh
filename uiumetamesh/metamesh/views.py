@@ -4,6 +4,7 @@ from django.core import signing
 from datetime import datetime
 import json
 from django.db.models import Q
+from django.http import HttpResponse
 # Create your views here.
 
 key = '011201171'
@@ -39,7 +40,7 @@ def validate_user (req) :
         if (objj and objj.password == __pass):
             objj.active = "true"
             objj.save()
-            req.session['validate'] = True
+            req.session['validate'] = objj.stu_id
             encrp = signing.dumps(objj.stu_id, key=key)
             return redirect('dashb', user=encrp)
 
@@ -50,7 +51,7 @@ def logout(req, user):
         obj = students.objects.get(stu_id = user)
         obj.active = 'false'
         obj.save()
-        del req.session['validate']
+        req.session.flush()
 
     return redirect('login')
         
@@ -119,79 +120,180 @@ def likeit(req):
         return redirect('login') 
 
 def club(req, user):
-    dercp = signing.loads(user, key=key)
-    obj = students.objects.get(stu_id = dercp)
-    clubss = clubs.objects.all()
-    sortclub = json.dumps(list(clubApproval.objects.filter(studentss = obj).values()))
-    data = {
-        'obj': obj,
-        'enp': user,
-        'club':clubss,
-        'sort': sortclub,
-    }
-    return render(req, "club.html", data)
+    if 'validate' in req.session:
+        dercp = signing.loads(user, key=key)
+        obj = students.objects.get(stu_id = dercp)
+        clubss = clubs.objects.all()
+        sortclub = json.dumps(list(clubApproval.objects.filter(studentss = obj).values()))
+        data = {
+            'obj': obj,
+            'enp': user,
+            'club':clubss,
+            'sort': sortclub,
+        }
+        return render(req, "club.html", data)
+    else:
+        return redirect('login')
 
 def createClub(req, user):
-    derc = signing.loads(user, key=key)
-    obj = students.objects.get(stu_id = derc)
+    if 'validate' in req.session:
 
-    if req.method == "POST":
-        cname = req.POST['cname']
-        ctype = req.POST['ctype']
-        purpose = req.POST['purpose']
-        rules = req.POST['rules']
-        admin = req.POST['admin']
-        print(admin)
-        if admin == 'Admin':
-            a_name = obj.firstName + " " + obj.lastName
-            a_obj = obj
-        else:
-            a_name = req.POST['adminname']
-            a_obj = students.objects.get(stu_id = req.POST['adminmail'])
+        derc = signing.loads(user, key=key)
+        obj = students.objects.get(stu_id = derc)
 
-        clu = clubs(clubname = cname, clubtype = ctype, purpose = purpose, rules = rules, adminname = a_name, adminid = a_obj)
+        if req.method == "POST":
+            cname = req.POST['cname']
+            ctype = req.POST['ctype']
+            purpose = req.POST['purpose']
+            rules = req.POST['rules']
+            admin = req.POST['admin']
+            print(admin)
+            if admin == 'Admin':
+                a_name = obj.firstName + " " + obj.lastName
+                a_obj = obj
+            else:
+                a_name = req.POST['adminname']
+                a_obj = students.objects.get(stu_id = req.POST['adminmail'])
+
+            clu = clubs(clubname = cname, clubtype = ctype, purpose = purpose, rules = rules, adminname = a_name, adminid = a_obj)
+            
+            clu.save()
         
-        clu.save()
-    
-    return redirect('club', user)
+        return redirect('club', user)
+    else:
+        return redirect('login')
 
 def clubApprove(req, user, club):
-    clubd = clubs.objects.get(clubname = club)
-    student = students.objects.get(stu_id = signing.loads(user, key=key))
-    admin = clubd.adminid
-    if admin == student:
-        status = "Enter"
+    if 'validate' in req.session:
+        clubd = clubs.objects.get(clubname = club)
+        student = students.objects.get(stu_id = signing.loads(user, key=key))
+        admin = clubd.adminid
+        if admin == student:
+            status = "Enter"
+        else:
+            status = "Pending"
+
+        clubapprv = clubApproval(clubid = clubd, studentss = student, status = status, admin = admin)
+        clubapprv.save()
+
+        return redirect('club', user=user) 
     else:
-        status = "Pending"
-
-    clubapprv = clubApproval(clubid = clubd, studentss = student, status = status, admin = admin)
-    clubapprv.save()
-
-    return redirect('club', user=user) 
+        return redirect('login')
 
 def clubDash (req, user, club):
-
-    decrp = signing.loads(user, key=key)
-    obj = students.objects.get(stu_id = decrp)
-    clubb = clubs.objects.get(clubname = club)
-    data = {
-        'obj':obj ,
-        'enp': user,
-        'clb':clubb,
-    }
-    return render(req, 'clubdashboard.html', data)
-
-def posthandling(req, user, club):
-    if req.method == "POST":
-        texts = req.POST['texts']
-        studnt = students.objects.get(stu_id = signing.loads(user, key=key))
+    if 'validate' in req.session:
+        print(club)
+        decrp = signing.loads(user, key=key)
+        obj = students.objects.get(stu_id = decrp)
         clubb = clubs.objects.get(clubname = club)
-        iid = clubb.clubname + " " + datetime.now()
+        cposts = clubpost.objects.filter(clubidd = clubb)
+        pending = clubApproval.objects.filter(clubid = clubb).filter(status = "Pending")
+        members = clubApproval.objects.filter(clubid = clubb).filter(status = "Joined")
+        clikes = json.dumps(list(clublikes.objects.filter(club = clubb).filter(student = obj).values()))
 
-        clubposts = clubpost(texts = texts, clubid = clubb, student = studnt, iid = iid)
-        clubposts.save()
+        events= eevent.objects.filter(club = clubb)
+        data = {
+            'obj':obj ,
+            'enp': user,
+            'clb':clubb,
+            'clbname':club,
+            'cpost': cposts,
+            'pendings': pending,
+            'joined':members,
+            'clikes': clikes,
+            'events':events,
+        }
+        return render(req, 'clubdashboard.html', data)
+    else:
+        return redirect('login')
 
-    return redirect('cdash', user=user, club=club)
+def clubposthandling(req, user, club):
+    if 'validate' in req.session:
+        if req.method == "POST":
+            texts = req.POST['texts']
+            studnt = students.objects.get(stu_id = signing.loads(user, key=key))
+            clubb = clubs.objects.get(clubname = club)
+            iid = clubb.clubname + " " + datetime.now().strftime("%d-%m-%Y-%H-%S")
 
-    
+            clubposts = clubpost(texts = texts, clubidd = clubb, student = studnt, iid = iid)
+            clubposts.save()
+
+            return redirect('cdash', user=user, club=club)
+        return HttpResponse("Hello")
+    else:
+        return redirect('login')
+
+def doapprove(req, club, student):
+    calab = clubs.objects.get(clubname = club)
+    ishtudent = students.objects.get(stu_id = student)
+    theclub = clubApproval.objects.get(clubid = calab, studentss=ishtudent)
+    theclub.status = "Joined"
+    theclub.save()
+
+    return redirect('cdash', user=signing.dumps(student, key=key), club=club)
         
+def likeclubpost(req):
+    if req.method == "POST":
+        club_obj = clubs.objects.get(clubname = req.POST.get('clubid'))
+        user_obj = students.objects.get(stu_id = signing.loads(req.POST.get('studentid'), key=key))
+        post = clubpost.objects.get(iid = req.POST.get('postid'))
+        post.upvote = int(post.upvote) + 1
+        post.save()
+
+        clikes = clublikes(counter = post.upvote, student = user_obj, club = club_obj, post = post)
+
+        clikes.save()
+        return redirect('cdash', user=req.POST.get('studentid'), club=req.POST.get('clubid'))
+    
+def refreshchat(req, user):
+    if 'validate' in req.session:
+        stuobj = students.objects.get(stu_id = signing.loads(user, key=key))
+        filtee = students.objects.filter(active = "true")
+        print(stuobj)
+        data = {
+            'activ': filtee,
+            'user':stuobj,
+        }
+
+    return render(req, "refreshchat.html", data)
+
+def event(req, user, club):
+    print(club)
+    if 'validate' in req.session and req.method == "POST":
+        if 'img' in req.FILES:
+            bannerr = req.FILES['img']
+        else:
+            bannerr = ""
+        print(bannerr)
+        name = req.POST['ename']
+        cat = req.POST['cate']
+        clubss = clubs.objects.get(clubname = club)
+        studentss = students.objects.get(stu_id = signing.loads(user, key=key))
+        stime = req.POST['sdate']
+        etime = req.POST['edate']
+        details = req.POST['details']
+
+        _vent = eevent(bannerImg = bannerr, name=name, cat=cat, club=clubss, admin = studentss, stime = stime, etime = etime, details = details)
+
+        _vent.save()
+
+        members = clubApproval.objects.filter(clubid = clubss).filter(status = "Joined")
+
+        messg = studentss.firstName + " " + studentss.lastName+ " have announced an event you may interested in."
+        for mems in members:
+            noti = notification(message = messg, to = mems.studentss)
+            noti.save()
+
+        return redirect('cdash', user=user, club=club)
+    else:
+        return redirect('login')
+    
+def comment(req):
+    if req.method == "POST":
+        objj = likes.objects.get(post = req.POST.get('post'), user = req.POST.get('user'))
+        objj.comment = "HEllo"
+        objj.save()
+
+        return redirect('dashb', user=signing.dumps(req.POST.get('user'), key=key))
+
+

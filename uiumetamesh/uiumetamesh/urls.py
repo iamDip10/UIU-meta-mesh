@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from metamesh import views
+from django.conf import settings  
+from django.conf.urls.static import static 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("" , views.indexPage, name="login"),
@@ -31,5 +34,13 @@ urlpatterns = [
     path('addclub/<str:user>', views.createClub, name='addclub'),
     path('clubapprove/<str:user>/<str:club>', views.clubApprove, name='approval'),
     path('clubdash/<str:user>/<str:club>', views.clubDash, name='cdash'),
-    path('posthandle/<str:user>/<str:club>', views.posthandling, name='phandle'),
+    path('posthandle/<str:user>/<str:club>', views.clubposthandling, name='phandle'),
+    path('doapporve/<str:club>/<str:student>', views.doapprove, name='doapprove'),
+    path('likeclubpost/', views.likeclubpost, name='likeclubpost'),
+    path('refreeshchat/<str:user>', views.refreshchat, name='refchat'),
+    path('eventadd/<str:user>/<str:club>', views.event, name='createevent'),
+    path('comment/', views.comment, name='comment'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

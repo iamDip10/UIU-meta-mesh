@@ -158,7 +158,11 @@
                     <h3 class="text-4xl font-bold">{{c.clubname}}</h3>
                     <h3>{{c.purpose}}</h3>
                 </div>
-                <a id="{{c.clubname}}" data-cname="{{c.clubname}}" href="{% url 'approval' user=enp club=c.clubname %}" class="w-1/6 h-1/3 bg-green-500 ml-8 flex justify-center items-center text-2xl text-white rounded-2xl">Join</a>
+                {% if c.adminid == obj %}
+                <a id="{{c.clubname}}" href="{% url 'cdash' user=enp club=c.clubname %}" class="w-1/6 h-1/3 ml-8 flex justify-center items-center text-2xl text-white rounded-2xl" style="background-color: blue;">Enter</a>
+                {% else %}
+                <a id="{{c.clubname}}" href="{% url 'approval' user=enp club=c.clubname %}" class="w-1/6 h-1/3 bg-green-500 ml-8 flex justify-center items-center text-2xl text-white rounded-2xl">Join</a>
+                {% endif %}
             
             </div>
             {% endfor %}
@@ -174,16 +178,17 @@
         let sortt = JSON.parse('{{sort|escapejs}}') ;
         console.log(sortt)
         for (var i = 0; i<sortt.length; i++) {
-            if (sortt[i].studentss_id !=sortt[i].admin ) {
+            if (sortt[i].studentss_id !=sortt[i].admin && sortt[i].status != 'Joined' ) {
 
                 document.getElementById(sortt[i].clubid_id).innerHTML = sortt[i].status ;
                 document.getElementById(sortt[i].clubid_id).style.backgroundColor = "orange" ;
-                document.getElementById(sortt[i].clubid_id).disabled = true ;
+                document.getElementById(sortt[i].clubid_id).style.pointerEvents = "none" ;
             }
-            else if(sortt[i].studentss_id ==sortt[i].admin  ) {
-                document.getElementById(sortt[i].clubid_id).innerHTML = sortt[i].status ;
+            else if(sortt[i].studentss_id ==sortt[i].admin || sortt[i].status == "Joined" ) {
+                var url = "{% url 'cdash' user=enp club='__clubid__' %}".replace("__clubid__", sortt[i].clubid_id );
+                document.getElementById(sortt[i].clubid_id).innerHTML = "Enter" ;
                 document.getElementById(sortt[i].clubid_id).style.backgroundColor = "blue" ;
-                document.getElementById(sortt[i].clubid_id).href = "{% url 'cdash' user=enp club=sortt[i].clubid_id %}" ;
+                document.getElementById(sortt[i].clubid_id).href = url ;
                 document.getElementById(sortt[i].clubid_id).disabled = false ;
             }
 

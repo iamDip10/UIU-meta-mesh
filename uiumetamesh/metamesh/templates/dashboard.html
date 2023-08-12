@@ -159,13 +159,15 @@
                                     <h3 class="ml-2">Upvote</h3>
                                 </button>
                             </div>
-                            <div class="w-1/2 h-full">
-                                <button class="w-full h-full flex justify-center items-center hover:text-orange-500">
-                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.9" d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
-                                    </svg>
-                                    <h3 class="ml-2">Comment</h3>
-                                </button>
+                            <div class="w-1/2 h-full flex">
+                                <form class="w-full h-full flex items-center justify-center" method="post" action="">
+                                    {% csrf_token %}
+                                    <input type="text" name="comnt" id="" data-csrrf='{% csrf_token %}' data-postid="{{posts.iid}}" data-enp="{{enp}}" data-user="{{user.stu_id}}" placeholder="Enter a comment" class="comnt ml-8 rounded-2xl">
+                                    <button class="w-full h-full flex justify-center items-center hover:text-orange-500">
+                                        Comment
+                                    </button> 
+
+                                </form>
                             </div>
                             
                             
@@ -181,16 +183,17 @@
                         <div class="w-3 h-3 rounded-full bg-green-500 ml-2"></div>
                     </div>
                     <!-- chatbox -->
-                    {% for actib in activ %}
+                    <div id="chat" class="w-full h-full flex flex-col"></div>
+                    <!-- {% for actib in activ %}
                     {% if actib.stu_id != user.stu_id %}
-                    <div class="w-full h-14 rounded-2xl flex px-8 bg-orange-300 items-center">
+                    <div class="w-full h-14 rounded-2xl mt-4 flex px-8 bg-orange-300 items-center">
                         <img src="" alt="" class="w-10 bg-black h-10 rounded-full">
                         
                         <h3 class="text-md font-md ml-3">{{actib.firstName}}</h3>
                         
                     </div>
                     {% endif %}
-                    {% endfor %}
+                    {% endfor %} -->
                 </div>
             </div>
         </div>
@@ -212,8 +215,9 @@
         console.log('{{user.firstName}}');
         for (var i=0; i<_likes.length; i++) {
             console.log(_likes[i].post_id);
-            document.getElementById(_likes[i].post_id).disabled = true;
+            document.getElementById(_likes[i].post_id).style.pointerEvents = "none";
             document.getElementById(_likes[i].post_id).style.backgroundColor = '#ffcd7f';
+
         }
 
         $(document).ready(function() {
@@ -223,7 +227,7 @@
                 let users = $(this).data('user');
                 let enp = $(this).data('enp') ;
                 console.log(csrf) ;
-
+                $(this).css('background', "orange");
                 $.ajax ({
                     type: 'POST',
                     url: "{% url 'likeit' %}",
@@ -236,6 +240,39 @@
                     success: function() {
                         console.log("HELlo") ;
                     }
+                });
+            });
+        });
+
+        setInterval(function() {
+            $.ajax({
+                type: "GET",
+                url: "{% url 'refchat' user=enp %}",
+                dataType:'html',
+                success: function(res) {
+                    console.log("Hellobaal");
+                    $('#chat').html(res) ;
+                },
+            });
+        }, 4000);
+
+        $(document).ready(function() {
+            $('.comnt').on('click', function() {
+                let csrf = $('[name=csrfmiddlewaretoken]').val() ;
+                let user = $(this).data('user') ;
+                let postid = $(this).data('postid') ;
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'comment' %}",
+                    data: {
+                        csrfmiddlewaretoken: csrf,
+                        user: user,
+                        post: postid,
+                    },
+                    success: function() {
+                        console.log($(this).val());
+                    }
+
                 });
             });
         });
