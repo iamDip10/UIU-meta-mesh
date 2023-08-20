@@ -66,6 +66,7 @@ def dashboard(req, user):
         postJS = json.dumps(list(_post.values()))
         noti = notification.objects.filter(to = __obj)
         active = students.objects.filter(active = 'true')
+        alls = students.objects.all()
         data = {
             'user': __obj,
             'enp':user,
@@ -74,6 +75,7 @@ def dashboard(req, user):
             'postJS':postJS,
             'noti': noti,
             'activ': active,
+            'all':alls,
         }
 
         return render(req, 'dashboard.html', data)
@@ -296,4 +298,13 @@ def comment(req):
 
         return redirect('dashb', user=signing.dumps(req.POST.get('user'), key=key))
 
+def notice(req, user):
 
+    dumm = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = dumm)
+
+    data = {
+        'user':obj,
+        'enp':user,
+    }
+    return render(req, "notice.html", data)

@@ -40,6 +40,8 @@ urlpatterns = [
     path('refreeshchat/<str:user>', views.refreshchat, name='refchat'),
     path('eventadd/<str:user>/<str:club>', views.event, name='createevent'),
     path('comment/', views.comment, name='comment'),
+    path('notice/<str:user>', views.notice, name='notice'),
+
 ]
 
 if settings.DEBUG:

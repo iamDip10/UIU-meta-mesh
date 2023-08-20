@@ -92,3 +92,19 @@ class eevent(models.Model):
 
     class Meta:
         db_table = "event"
+
+class conversations(models.Model):
+    userss = models.ManyToManyField(students)
+    created_at = models.DateTimeField(auto_now_add=True)
+    pkk = models.CharField(max_length=200, primary_key=True)
+    class Meta:
+        db_table = "conversations"
+
+class messages(models.Model):
+    convs = models.ForeignKey(conversations, on_delete=models.CASCADE)
+    sender = models.ForeignKey(students, on_delete=models.CASCADE)
+    msg = models.CharField(max_length=300, default="", null=True)
+
+    class Meta:
+        db_table = "message"
+

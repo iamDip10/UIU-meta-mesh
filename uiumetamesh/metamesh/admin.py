@@ -10,4 +10,5 @@ admin.site.register(clubApproval)
 admin.site.register(clubpost)
 admin.site.register(clublikes)
 admin.site.register(eevent)
-
+admin.site.register(conversations)
+admin.site.register(messages)
