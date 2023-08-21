@@ -69,10 +69,12 @@
             <p class="font-bold text-4xl text-white">E</p>
 
         </div>
-        <div class="w-full h-full flex bg-gray-100 mt-3 rounded-2xl ml-3 px-10">
-            <div class="mt-4 rounded-xl w-full bg-orange-100 text-2xl flex items-center px-20" style="height: 10vh;">
-                <a href="">Hello I am</a>
-            </div>            
+        <div class="w-full h-full flex flex-col overflow-y-auto bg-gray-100 mt-3 rounded-2xl ml-3 px-10">
+            {% for link, head in zip %}
+            <div class="mt-4 rounded-xl h-20 w-full bg-orange-100 text-2xl flex items-center px-20" style="height: 10vh;">
+                <a href="{{link}}" target="_blank" class="h-full">{{head}}</a>
+            </div>        
+            {% endfor %}    
         </div>
 
     </div>

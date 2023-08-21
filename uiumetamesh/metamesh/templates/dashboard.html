@@ -164,15 +164,26 @@
                 </div>
             </div>
             <div class="w-2/4 flex flex-col mt-3 px-14 h-full items-center rounded-2xl">
-                <div class="w-5/6 h-20 bg-gray-100 rounded-2xl flex flex-col items-center justify-center">
+                <div class="w-5/6 bg-gray-100 rounded-2xl flex flex-col items-center" style="height: 15vh; padding: 2vh 0 0 0;">
                     <div class="flex w-full justify-center">
                         <img src="" alt="" class="h-12 w-12 rounded-full bg-black">
                         <button class="w-3/4 ml-3 h-10 pl-8 text-gray-300 bg-white flex items-center rounded-2xl" onclick="popup()">Share your thoughts</button>
                     </div>
-                    
+                    <div class="flex w-full items-center justify-end px-20">
+                        <p class="h-full flex justify-center items-center px-6 ">Filter by category</p>
+                        <select name="" id="change" class=" mt-5 h-full w-1/3 flex items-center text-center rounded-2xl">
+                            <option value="urgent">Urgent</option>
+                            <option value="help">Help</option>
+                            <option value="club">Club</option>
+                            <option value="job">Job</option>
+                            <option value="seek">Seeking Post</option>
+
+
+                        </select>
+                    </div>
                     
                 </div>
-                <div class="w-5/6 h-5/6 mt-5 px-3 rounded-2xl pb-2 overflow-y-auto">
+                <div id="postt" class="w-5/6 h-5/6 mt-5 px-3 rounded-2xl pb-2 overflow-y-auto">
 
                     <!-- createpost -->
                     {% for posts in post %}
@@ -181,7 +192,13 @@
                             <img src="" alt="" class="w-12 h-12 rounded-full bg-black">
                             <div class="w-2/3 h-fit flex flex-col">
                                 <h3 class="ml-2 text-md font-bold">{{posts.student.firstName|add:" "|add:posts.student.lastName}}</h3>
-                                <h3 class="ml-2">{{posts.student.stu_id}}</h3>
+                                <div class="ml-2 w-full h-fit flex items-center">
+                                    <h3 class="">{{posts.student.stu_id}}</h3>
+                                    <div class="ml-2 w-20 h-fit bg-orange-400 rounded-2xl flex justify-center text-white">
+
+                                        <p class="font-bold">{{posts.category}}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="w-full h-fit mt-2 mb-6">
@@ -292,6 +309,20 @@
                 },
             });
         }, 4000);
+
+        $("#change").change(function() {
+            var val = $(this).val() ;
+
+            $.ajax({
+                url: "{% url 'categorize' user=enp %}",
+                data: {
+                    'cat':val,
+                },
+                success: function(data){
+                    $("#postt").html(data) ;
+                }
+            });
+        }) ;
 
         $(document).ready(function() {
             $('.comnt').on('click', function() {

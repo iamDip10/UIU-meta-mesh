@@ -5,6 +5,8 @@ from datetime import datetime
 import json
 from django.db.models import Q
 from django.http import HttpResponse
+from bs4 import BeautifulSoup
+import requests
 # Create your views here.
 
 key = '011201171'
@@ -302,9 +304,37 @@ def notice(req, user):
 
     dumm = signing.loads(user, key=key)
     obj = students.objects.get(stu_id = dumm)
+    noticee = []
+    linkss = []
+    for i in range(0, 10):
+        reqs = requests.get("https://www.uiu.ac.bd/notices/page/"+str(i))
+        soup = BeautifulSoup(reqs.content, "html.parser")
+        for links in soup.find_all("article"):
+            headrs = links.find('header')
+            h2 = headrs.find("h2")
+            a = h2.find("a")
+            # print(a.get("href"))
+            linkss.append(a.get("href"))
+            noticee.append(h2.text)
 
+        zipit = zip(linkss, noticee)
+        print(zipit)
     data = {
         'user':obj,
         'enp':user,
+        'zip':zipit,
     }
     return render(req, "notice.html", data)
+
+def categorize(req, user):
+
+    userr = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = userr)
+    filtr = posts.objects.filter(category = req.GET.get('cat'))
+    print(req.GET.get('cat'), filtr)
+    data = {
+        'post':filtr,
+        'enp':user,
+        'stu':obj,
+    }
+    return render(req, "categorize.html", data)

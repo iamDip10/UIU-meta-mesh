@@ -41,6 +41,7 @@ urlpatterns = [
     path('eventadd/<str:user>/<str:club>', views.event, name='createevent'),
     path('comment/', views.comment, name='comment'),
     path('notice/<str:user>', views.notice, name='notice'),
+    path('catss/<str:user>', views.categorize, name='categorize'),
 
 ]
 
