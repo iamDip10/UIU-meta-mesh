@@ -42,6 +42,16 @@ urlpatterns = [
     path('comment/', views.comment, name='comment'),
     path('notice/<str:user>', views.notice, name='notice'),
     path('catss/<str:user>', views.categorize, name='categorize'),
+    path('sendmsg/<str:user>', views.sendmsg, name='sendmsg'),
+    path('getmsg/<str:user>', views.getmsg, name='getmsg'),
+    path('commnt/<str:user>', views.comment, name='commentit'),
+    path('getbig/<str:user>', views.getbig, name='getbig'),
+    path('profile/<str:user>', views.profile, name='profile'),
+
+
+
+
+
 
 ]
 

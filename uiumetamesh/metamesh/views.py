@@ -112,8 +112,14 @@ def likeit(req):
             post_obj = posts.objects.get(iid = req.POST.get('post_id'))
             post_obj.upvote = int(post_obj.upvote) + 1 
             post_obj.save()
-            like = likes(counter = post_obj.upvote, post = post_obj, user = students.objects.get(stu_id = req.POST.get('user')))
-            like.save()
+            if likes.objects.filter(post=post_obj, user=user).exists():
+                likeobj = likes.objects.get(post=post_obj, user=user)
+                likeobj.counter = post_obj.upvote
+                likeobj.save()
+            else:
+                like = likes(counter = post_obj.upvote, post = post_obj, user = students.objects.get(stu_id = req.POST.get('user')))
+                like.save()
+
             message = user.firstName + " " + user.lastName + " has upvoted your post."
             notificat = notification(message = message, to=post_obj.student)
             notificat.save()
@@ -292,13 +298,6 @@ def event(req, user, club):
     else:
         return redirect('login')
     
-def comment(req):
-    if req.method == "POST":
-        objj = likes.objects.get(post = req.POST.get('post'), user = req.POST.get('user'))
-        objj.comment = "HEllo"
-        objj.save()
-
-        return redirect('dashb', user=signing.dumps(req.POST.get('user'), key=key))
 
 def notice(req, user):
 
@@ -319,10 +318,13 @@ def notice(req, user):
 
         zipit = zip(linkss, noticee)
         print(zipit)
+    
+    alls = students.objects.all()
     data = {
         'user':obj,
         'enp':user,
         'zip':zipit,
+        'all': alls,
     }
     return render(req, "notice.html", data)
 
@@ -338,3 +340,99 @@ def categorize(req, user):
         'stu':obj,
     }
     return render(req, "categorize.html", data)
+
+def sendmsg (req, user) :
+
+    decrp = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = decrp)
+    toObj = students.objects.get(stu_id = req.POST.get('tousr')) 
+    _pk = toObj.stu_id+"_"+obj.stu_id
+    _orpk = obj.stu_id+"_"+toObj.stu_id
+
+    print(_pk, _orpk)
+    
+
+    if conversations.objects.filter(pkk = _pk).exists():
+        mesg = messages.objects.create(convs=conversations.objects.get(pkk = _pk), sender = obj, msg = req.POST.get('msg'))
+    elif conversations.objects.filter(pkk = _orpk).exists():
+        mesg = messages.objects.create(convs=conversations.objects.get(pkk = _orpk), sender = obj, msg = req.POST.get('msg'))
+    else:
+        convo = conversations.objects.create(pkk = _pk)
+        convo.userss.add(obj, toObj)
+        mesg = messages.objects.create(convs=convo, sender = obj, msg = req.POST.get('msg'))
+
+    return HttpResponse(status=204)
+
+def getmsg(req, user):
+    derc= signing.loads(user, key=key)
+    objj = students.objects.get(stu_id = derc) 
+
+    toobj = students.objects.get(stu_id = req.GET.get('to_id'))
+
+    pk1 = objj.stu_id + "_" + toobj.stu_id
+    pk2 = toobj.stu_id+ "_"+ objj.stu_id
+
+    if conversations.objects.filter(pkk = pk1).exists():
+        msgs = messages.objects.filter(convs = conversations.objects.get(pkk = pk1)) 
+    elif conversations.objects.filter(pkk = pk2).exists():
+        msgs = messages.objects.filter(convs = conversations.objects.get(pkk = pk2))
+    else:
+        msgs = ""
+
+    data = {
+        "enp": user,
+        "user": objj,
+        "msgs":msgs,
+    }
+
+    return render(req, 'getmsg.html', data)
+
+def comment(req, user):
+    der = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = der) 
+    comnt = req.POST.get('cmnt') 
+    postid = req.POST.get('postid')
+    pst = posts.objects.get(iid = postid)
+    if likes.objects.filter(post=pst, user=obj).exists():
+        print(comnt)
+        likeobj = likes.objects.get(post=pst, user=obj)
+        likeobj.comment = comnt
+        likeobj.save()
+    else:
+        cmntobj = likes(post=pst, user=obj, comment=comnt)
+        cmntobj.save()
+
+    msg = obj.firstName + " " + obj.lastName + " has commented on your posts."
+    notiobj = notification(message=msg, to=pst.student)
+    notiobj.save()
+    return HttpResponse(status=204)
+
+
+def getbig(req, user):
+    dec = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = dec) 
+
+    postid = posts.objects.get(iid = req.GET.get('post'))
+    comnts = likes.objects.filter(post = postid)
+
+    data= {
+        'user': user,
+        "post": postid,
+        'cmnts': comnts,
+    }
+
+    return render(req, "bigpost.html", data)
+
+def profile(req, user):
+    obj = students.objects.get(stu_id = signing.loads(user, key=key))
+
+    pObj = posts.objects.filter(student = obj)
+    like = likes.objects.all()
+    data = {
+        "user":obj,
+        'enp':user,
+        'post':pObj,
+        'likes':like,
+    }
+
+    return render(req, "profile.html", data)

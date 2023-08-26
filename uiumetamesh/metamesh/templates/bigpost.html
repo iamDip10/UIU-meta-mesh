@@ -1,0 +1,25 @@
+<div class="w-full h-20 flex items-center">
+    <img src="" alt="" class="rounded-full" style="width: 5vh; height: 5vh;">
+    <div class="ml-2 flex flex-col justify-center">
+        <p>{{post.student.firstName|add:" "|add:post.student.lastName}}</p>
+        <div class="flex">
+            <p>{{post.student.stu_id}}</p>
+            <p class="ml-2">{{post.category}}</p>
+        </div>
+    </div>
+</div>
+<div class="w-full h-fit bg-orange-100 rounded-xl" style="padding: 2vh 2vh 2vh 2vh;">
+    <p>{{post.text}}</p>
+</div>
+<div class="w-full overflow-y-auto" style="height: 50vh;">
+    <p class="mt-3">Comments</p>
+    {% for c in cmnts %}
+        <div class="w-full h-fit flex bg-gray-100 mt-2 rounded-xl" style="padding: 1vh 1vh 1vh 1vh;">
+            <img src="" alt="" class="rounded-full" style="width: 5vh; height: 5vh;">
+            <div class=" ml-2 w-full h-full flex flex-col">
+                <p>{{c.user.firstName|add:" "|add:c.user.lastName}}</p>
+                <p>{{c.comment}}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

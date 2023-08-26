@@ -1,0 +1,12 @@
+{% for msg in msgs%}
+
+    {% if msg.sender == user %}
+    <div class="w-full h-fit text-xl flex items-center justify-end bg-gray-100 " style="height: 4vh; ">
+        <p class="px-10">{{msg.msg}}</p>
+    </div>
+    {% else %}
+    <div class="w-full h-fit text-xl flex bg-orange-100">
+        <p class="px-10">{{msg.msg}}</p>
+    </div>
+    {% endif %}
+{% endfor %}

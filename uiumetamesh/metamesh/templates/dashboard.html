@@ -11,18 +11,25 @@
 </head>
 <body>
     <div class="w-screen h-screen overflow-hidden flex flex-col">
+        <div id="big" onclick="hello()" class="absolute w-full h-full flex justify-center items-center" style="display: none; background-color: rgba(94, 94, 94, 0.7);">
+            <div id="contain" class="w-1/3 h-3/4 flex flex-col bg-white rounded-3xl px-5" style="padding: 5vh 5vh 5vh 5vh;">
+                
+            </div>
+        </div>
         <div id="pops" class="absolute w-full h-full flex justify-center items-center" style="display: none; background-color: rgba(94, 94, 94, 0.7);">
             <div class="w-2/3 h-3/4 flex bg-white rounded-3xl px-5" style="padding-top: 10px;">
                 <div class="w-1/3 h-full flex flex-col">    
                     <div class="w-full flex justify-center items-center bg-gray-100 rounded-3xl" style="height: 10vh;">
                         <p class="text-2xl font-bold">Chats</p>
                     </div>
-                    <div id="listdiv" class="w-full h-5/6 flex flex-col items-center">
+                    <div id="listdiv" class="w-full h-5/6 flex flex-col items-center rounded-2xl">
                         {% for sts in all %}
+                        {% if sts != user %}
                         <div onclick="popmsgg('{{sts.stu_id}}', '{{sts.firstName}}', '{{sts.lastName}}')" class="w-full rounded-2xl mt-4 flex bg-orange-300 items-center px-8" style="height: 6vh;">
                             <img src="" alt="" class="w-20 h-20 rounded-full bg-black" style="width: 5vh;height: 5vh;">
                             <p class="ml-4">{{sts.firstName|add:" "|add:sts.lastName}}</p>
                         </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
                 </div>
@@ -33,13 +40,13 @@
                             <p>Active now</p>
                         </div>
                         <div class="w-full h-full flex flex-col" style="padding: 2vh 0 0 0;">
-                            <div class="w-full" style="height: 54vh;">
+                            <div id="showmsg" class="w-full flex flex-col overflow-y-auto" style="height: 50vh;">
 
                             </div>
                             <div class="w-full h-20">
                                 <div class="w-full h-full flex justify-between">
                                     <input type="text" name="msg" id="msgg" placeholder="Enter message" class="flex justify-center w-3/4 h-3/4 rounded-3xl">
-                                    <input type="submit" name="" id="btn" data-from="{{user}}" value="Send" class="bg-orange-300 rounded-2xl w-1/4 h-3/4 ml-3">
+                                    <button class="bg-orange-300 rounded-2xl w-1/4 h-3/4 ml-3" id="sendbtn" onclick="sendd()" data-ccsrf = '{% csrf_token %}'>Send</button>
                                 </div>
                             </div>
                         </div>
@@ -108,15 +115,24 @@
                     <h3>Club</h3>
                 </a>
             </div>
-            <a href="{% url 'logout' user=user.stu_id %}" class="w-1/4 h-full flex justify-end items-center px-12">
-                <img src="" alt="" class="w-12 h-12 mr-4 rounded-full bg-black">
-                <div class="h-full flex flex-col justify-center items-center">
-                    <svg class="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.9" d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"/>
-                    </svg>
-                    <h3>Logout</h3>
-                </div>
-            </a>
+            <div class="w-1/4 h-full flex justify-end items-center px-12">
+                <a href="{% url 'profile' user=enp %}">
+
+                    {% if user.profpic.url != "" %}
+                        <img src="{{user.profpic.url}}" alt="" class="object-cover rounded-full w-12 h-12" style="margin-right: 1vh;">
+                    {% else %}
+                        <img src="" alt="" class="bg-black rounded-xl" style="width: 10vh; height: 10vh;">
+                    {% endif %}
+                </a>
+                <a href="{% url 'logout' user=user.stu_id %}">
+                    <div class="h-full flex flex-col justify-center items-center">
+                        <svg class="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.9" d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"/>
+                        </svg>
+                        <h3>Logout</h3>
+                    </div>
+                </a>
+            </div>
 
         </div>
         <div class="w-full h-full overflow-hidden flex ">
@@ -124,7 +140,12 @@
             <div class="w-1/4 h-full flex flex-col mt-3 px-9">
                 <div class="w-4/5 h-1/3 bg-gradient-to-b text-md from-orange-300 to-orange-400 flex flex-col rounded-2xl">
                     <div class="w-full h-28 flex px-3 mt-5">
-                        <img src="" alt="" class="h-24 w-24 rounded-full bg-black">
+
+                        {% if user.profpic.url != "" %}
+                            <img src="{{user.profpic.url}}" alt="" class="object-cover rounded-xl" style="width: 10vh; height: 10vh;">
+                        {% else %}
+                            <img src="" alt="" class="bg-black rounded-xl" style="width: 10vh; height: 10vh;">
+                        {% endif %}
                         <div class="w-1/2 ml-2 h-24 flex flex-col justify-center font-bold text-gray-700">
                             <h3>{{user.firstName|add:" "|add:user.lastName}}</h3>
                             <h3 class="text-sm w-full">{{user.dept}}</h3>
@@ -148,7 +169,7 @@
                 <!-- end of profile overview -->
 
                 <!-- start of notification -->
-                <div class="w-4/5 h-3/4 bg-gray-100 mt-8 flex flex-col rounded-2xl px-4">
+                <div class="w-4/5 bg-gray-100 mt-8 flex flex-col rounded-2xl px-4 overflow-y-auto" style="height: 50vh;">
                     <h3 class="w-1/2 h-fit text-xl mt-6 font-bold text-gray-500">Notification</h3>
 
                     {% for notis in noti %}
@@ -187,7 +208,8 @@
 
                     <!-- createpost -->
                     {% for posts in post %}
-                    <div class="w-full h-fit flex flex-col rounded-2xl bg-orange-100 px-8 mt-6 mb-5">
+                    {% if posts.student != user %}
+                    <div onclick="bigsize('{{posts.iid}}')" class="w-full h-fit flex flex-col rounded-2xl bg-orange-100 px-8 mt-6 mb-5">
                         <div class="w-full h-20 flex items-center">
                             <img src="" alt="" class="w-12 h-12 rounded-full bg-black">
                             <div class="w-2/3 h-fit flex flex-col">
@@ -214,20 +236,19 @@
                                     <h3 class="ml-2">Upvote</h3>
                                 </button>
                             </div>
-                            <div class="w-1/2 h-full flex">
-                                <form class="w-full h-full flex items-center justify-center" method="post" action="">
-                                    {% csrf_token %}
-                                    <input type="text" name="comnt" id="" data-csrrf='{% csrf_token %}' data-postid="{{posts.iid}}" data-enp="{{enp}}" data-user="{{user.stu_id}}" placeholder="Enter a comment" class="comnt ml-8 rounded-2xl">
-                                    <button class="w-full h-full flex justify-center items-center hover:text-orange-500">
-                                        Comment
-                                    </button> 
+                            <div class="w-1/2 h-full flex items-center justify-center">
+                                
+                                <input type="text" name="comnt" id="{{posts.iid}}" placeholder="Enter a comment" class="koment ml-8 rounded-2xl">
+                                <button class="cmnt w-full h-full flex justify-center items-center hover:text-orange-500" data-csrrf='{% csrf_token %}' data-postid="{{posts.iid}}" data-enp="{{enp}}" data-user="{{user.stu_id}}" >
+                                    Comment
+                                </button> 
 
-                                </form>
                             </div>
                             
                             
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -310,6 +331,8 @@
             });
         }, 4000);
 
+        
+
         $("#change").change(function() {
             var val = $(this).val() ;
 
@@ -323,31 +346,102 @@
                 }
             });
         }) ;
-
+        // <button class="cmnt w-full h-full flex justify-center items-center hover:text-orange-500" data-csrrf='{% csrf_token %}' data-postid="{{posts.iid}}" data-enp="{{enp}}" data-user="{{user.stu_id}}" >
+        //                             Comment
+        //                         </button> 
         $(document).ready(function() {
-            $('.comnt').on('click', function() {
-                let csrf = $('[name=csrfmiddlewaretoken]').val() ;
-                let user = $(this).data('user') ;
+            $('.cmnt').on('click', function() {
                 let postid = $(this).data('postid') ;
+                let enpp = $(this).data("enp");
+                let user = $(this).data("user") ;
+                let commentt = $(this).siblings('.koment').val() ;
+                let cssrf = $('[name=csrfmiddlewaretoken]').val();
+                $(this).siblings('.koment').val("") ;
+                console.log(commentt);
                 $.ajax({
-                    type: "POST",
-                    url: "{% url 'comment' %}",
-                    data: {
-                        csrfmiddlewaretoken: csrf,
-                        user: user,
-                        post: postid,
+                    type: "POST" ,
+                    url: "{% url 'commentit' user=enp %}",
+                    data:{
+                        csrfmiddlewaretoken: cssrf,
+                        postid:postid,
+                        cmnt: commentt,
                     },
                     success: function() {
-                        console.log($(this).val());
+                        console.log(commentt) ;
                     }
-
                 });
             });
         });
 
         let llb = document.getElementById("nn");
+        let __idd = "" ;
         function popmsgg(idd, fname, lname) {
             llb.innerHTML = fname + " " + lname;
+            __idd = idd;
+        }
+
+        let msgbox = document.getElementById('msgg') ;
+        function sendd() {
+            let ccs = $('[name=csrfmiddlewaretoken]').val();
+            let __msg = msgbox.value ;
+            msgbox.value = "" ;
+            console.log(ccs) ;
+            $.ajax({
+                type: "POST",
+                url: "{% url 'sendmsg' user=enp %}",
+                data: {
+                    csrfmiddlewaretoken: ccs,
+                    tousr : __idd,
+                    msg: __msg
+                },
+                success: function() {
+                    console.log("Sned successfully") ;
+                }
+            });
+        }
+
+        
+        function bigsize(str) {
+            let divv = document.getElementById('big') ;
+            divv.style.display = "flex" ;
+
+            $.ajax({
+                url: "{% url 'getbig' user=enp %}",
+                data: {
+                    post: str,
+                },
+                success: function(res) {
+                    $('#contain').html(res) ;
+                },
+            });
+        }
+        
+
+        function popupmsg() {
+            document.getElementById("pops").style.display = "flex" ;
+            setInterval(function() {
+            $.ajax({
+                type: "GET",
+                url: "{% url 'getmsg' user=enp %}",
+                dataType:'html',
+                data:{
+                    to_id: __idd,
+                },
+                success: function(res) {
+                    $('#showmsg').html(res) ;
+                },
+            });
+            }, 1000);
+        }
+
+        function hello() {
+            let divv = document.getElementById('big') ;
+            divv.style.display = "none" ;
+        }
+
+        function del() {
+            let divv = document.getElementById('pops') ;
+            divv.style.display = "none";
         }
     </script>
 </body>
