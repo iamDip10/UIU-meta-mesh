@@ -82,7 +82,7 @@ class clublikes(models.Model):
 
 class eevent(models.Model):
     bannerImg = models.ImageField(upload_to='banner', blank=True, default="")
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, primary_key=True)
     cat = models.CharField(max_length=100)
     club = models.ForeignKey(clubs, on_delete=models.CASCADE)
     admin = models.ForeignKey(students, on_delete=models.CASCADE)

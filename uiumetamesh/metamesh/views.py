@@ -135,11 +135,13 @@ def club(req, user):
         obj = students.objects.get(stu_id = dercp)
         clubss = clubs.objects.all()
         sortclub = json.dumps(list(clubApproval.objects.filter(studentss = obj).values()))
+        alls = students.objects.all()
         data = {
             'obj': obj,
             'enp': user,
             'club':clubss,
             'sort': sortclub,
+            'all':alls,
         }
         return render(req, "club.html", data)
     else:
@@ -305,7 +307,7 @@ def notice(req, user):
     obj = students.objects.get(stu_id = dumm)
     noticee = []
     linkss = []
-    for i in range(0, 10):
+    for i in range(0, 3):
         reqs = requests.get("https://www.uiu.ac.bd/notices/page/"+str(i))
         soup = BeautifulSoup(reqs.content, "html.parser")
         for links in soup.find_all("article"):
@@ -436,3 +438,19 @@ def profile(req, user):
     }
 
     return render(req, "profile.html", data)
+
+def viewDetails(req, user):
+    der = signing.loads(user, key=key) 
+    obj = students.objects.get(stu_id=der) 
+    
+    dataa = req.GET.get("event") 
+    
+    evnt = eevent.objects.get(name = dataa) 
+    
+    dat = {
+        'enp':user,
+        'evnt':evnt,
+        'user': obj,
+    }
+    
+    return render(req, 'viewd.html', dat)

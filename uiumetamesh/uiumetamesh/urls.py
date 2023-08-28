@@ -47,10 +47,8 @@ urlpatterns = [
     path('commnt/<str:user>', views.comment, name='commentit'),
     path('getbig/<str:user>', views.getbig, name='getbig'),
     path('profile/<str:user>', views.profile, name='profile'),
-
-
-
-
+    path('vdetails/<str:user>', views.viewDetails, name='vdetails'),
+    
 
 
 ]
