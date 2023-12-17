@@ -16,6 +16,7 @@ def indexPage(req):
 def signupPage(req):
     return render(req, "signup.html")
 
+#taseen
 def post_sign(req):
     if req.method == "POST":
         s_id = req.POST['mail']
@@ -32,6 +33,7 @@ def post_sign(req):
         return redirect('login')
     return render("signup")
 
+#taseen
 def validate_user (req) :
     if req.method == "POST":
         __id = req.POST['email']
@@ -48,6 +50,7 @@ def validate_user (req) :
 
         return render(req, "index.html")
 
+#taseen
 def logout(req, user):
     if 'validate' in req.session:
         obj = students.objects.get(stu_id = user)
@@ -83,7 +86,8 @@ def dashboard(req, user):
         return render(req, 'dashboard.html', data)
     else:
         return redirect('login')
-        
+
+#shishir
 def postText(req, user):
     if 'validate' in req.session:
         encrp = signing.loads(user, key=key)
@@ -103,7 +107,8 @@ def postText(req, user):
         return redirect('dashb', user=user)
     else:
         return redirect('login')
-
+    
+#shishir
 def likeit(req):
     if 'validate' in req.session:
         if req.method == 'POST':
@@ -127,8 +132,70 @@ def likeit(req):
         print("Hello" + post_obj)
         return redirect('dashb', user=req.POST.get('enpp'))
     else:
-        return redirect('login') 
+        return redirect('login')
 
+
+
+#darain
+def profile(req, user):
+    obj = students.objects.get(stu_id = signing.loads(user, key=key))
+
+    pObj = posts.objects.filter(student = obj)
+    like = likes.objects.all()
+    data = {
+        "user":obj,
+        'enp':user,
+        'post':pObj,
+        'likes':like,
+    }
+
+    return render(req, "profile.html", data)
+
+def categorize(req, user):
+
+    userr = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = userr)
+    filtr = posts.objects.filter(category = req.GET.get('cat'))
+    print(req.GET.get('cat'), filtr)
+    data = {
+        'post':filtr,
+        'enp':user,
+        'stu':obj,
+    }
+    return render(req, "categorize.html", data)
+
+#darain
+def notice(req, user):
+
+    dumm = signing.loads(user, key=key)
+    obj = students.objects.get(stu_id = dumm)
+    noticee = []
+    linkss = []
+    for i in range(0, 3):
+        reqs = requests.get("https://www.uiu.ac.bd/notices/page/"+str(i))
+        soup = BeautifulSoup(reqs.content, "html.parser")
+        for links in soup.find_all("article"):
+            headrs = links.find('header')
+            h2 = headrs.find("h2")
+            a = h2.find("a")
+            # print(a.get("href"))
+            linkss.append(a.get("href"))
+            noticee.append(h2.text)
+
+        zipit = zip(linkss, noticee)
+        print(zipit)
+    
+    alls = students.objects.all()
+    data = {
+        'user':obj,
+        'enp':user,
+        'zip':zipit,
+        'all': alls,
+    }
+    return render(req, "notice.html", data)
+
+
+#khaled
 def club(req, user):
     if 'validate' in req.session:
         dercp = signing.loads(user, key=key)
@@ -301,47 +368,7 @@ def event(req, user, club):
         return redirect('login')
     
 
-def notice(req, user):
 
-    dumm = signing.loads(user, key=key)
-    obj = students.objects.get(stu_id = dumm)
-    noticee = []
-    linkss = []
-    for i in range(0, 3):
-        reqs = requests.get("https://www.uiu.ac.bd/notices/page/"+str(i))
-        soup = BeautifulSoup(reqs.content, "html.parser")
-        for links in soup.find_all("article"):
-            headrs = links.find('header')
-            h2 = headrs.find("h2")
-            a = h2.find("a")
-            # print(a.get("href"))
-            linkss.append(a.get("href"))
-            noticee.append(h2.text)
-
-        zipit = zip(linkss, noticee)
-        print(zipit)
-    
-    alls = students.objects.all()
-    data = {
-        'user':obj,
-        'enp':user,
-        'zip':zipit,
-        'all': alls,
-    }
-    return render(req, "notice.html", data)
-
-def categorize(req, user):
-
-    userr = signing.loads(user, key=key)
-    obj = students.objects.get(stu_id = userr)
-    filtr = posts.objects.filter(category = req.GET.get('cat'))
-    print(req.GET.get('cat'), filtr)
-    data = {
-        'post':filtr,
-        'enp':user,
-        'stu':obj,
-    }
-    return render(req, "categorize.html", data)
 
 def sendmsg (req, user) :
 
@@ -409,7 +436,6 @@ def comment(req, user):
     notiobj.save()
     return HttpResponse(status=204)
 
-
 def getbig(req, user):
     dec = signing.loads(user, key=key)
     obj = students.objects.get(stu_id = dec) 
@@ -424,20 +450,6 @@ def getbig(req, user):
     }
 
     return render(req, "bigpost.html", data)
-
-def profile(req, user):
-    obj = students.objects.get(stu_id = signing.loads(user, key=key))
-
-    pObj = posts.objects.filter(student = obj)
-    like = likes.objects.all()
-    data = {
-        "user":obj,
-        'enp':user,
-        'post':pObj,
-        'likes':like,
-    }
-
-    return render(req, "profile.html", data)
 
 def viewDetails(req, user):
     der = signing.loads(user, key=key) 
@@ -454,3 +466,12 @@ def viewDetails(req, user):
     }
     
     return render(req, 'viewd.html', dat)
+
+def jobDetails(req, user):
+    dd = signing.loads(user, key=key)
+    data = students.objects.get(stu_id=dd)
+    dat = {
+        'enp':data,
+        'user': user,
+    }
+    return render(req, 'jobs.html', dat)

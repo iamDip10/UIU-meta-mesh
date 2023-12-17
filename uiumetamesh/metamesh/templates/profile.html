@@ -51,7 +51,7 @@
         <div class="w-1/4 h-full flex justify-end items-center px-12">
             <a href="{% url 'profile' user=enp %}">
 
-                <img src="{{user.profpic.url}}" alt="" class="w-12 h-12 mr-4 rounded-full object-cover">
+                <img src="" alt="" class="w-12 h-12 mr-4 rounded-full object-cover">
             </a>
             <a href="{% url 'logout' user=user.stu_id %}">
                 <div class="h-full flex flex-col justify-center items-center">
@@ -68,7 +68,7 @@
     <div class="w-full h-full flex">
 
         <div class="w-1/5 bg-orange-300 flex-col rounded-2xl" style="height: 50vh;">
-            <div class=" mt-10 ml-5 flex justify-center items-center px-20 rounded-full bg-black" style="height: 15vh; width: 15vh;  background-image: url('{{user.profpic.url}}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+            <div class=" mt-10 ml-5 flex justify-center items-center px-20 rounded-full bg-black" style="height: 15vh; width: 15vh;  background-image: url(''); background-size: cover; background-position: center; background-repeat: no-repeat;">
     
                 <label for="image" class="img mt-10 font-bold mb-2 w-full">
                     
@@ -97,7 +97,7 @@
                 {% for posts in post %}
                 <div class="w-full h-fit flex flex-col rounded-2xl bg-orange-100 px-8 mt-6 mb-5">
                     <div class="w-full h-20 flex items-center">
-                        <img src="{{user.profpic.url}}" alt="" class="w-12 h-12 rounded-full object-cover">
+                        <img src="" alt="" class="w-12 h-12 rounded-full object-cover">
                         <div class="w-2/3 h-fit flex flex-col">
                             <h3 class="ml-2 text-md font-bold">{{posts.student.firstName|add:" "|add:posts.student.lastName}}</h3>
                             <div class="ml-2 w-full h-fit flex items-center">
